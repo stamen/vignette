@@ -51,17 +51,17 @@ var places = require(path.resolve(conf.config));
 async.waterfall([
   async.apply(tilelive.load, uri),
   function(source, done) {
-    return async.eachSeries(Object.keys(places), function(name, done) {
-      var place = places[name];
+    return async.eachSeries(places.features, function(place, done) {
+      var name = place.properties.name;
 
-      return async.eachSeries(range(place.minzoom, place.maxzoom + 1), function(zoom, done) {
+      return async.eachSeries(range(place.properties.minzoom, place.properties.maxzoom + 1), function(zoom, done) {
         console.log("Rendering %s at z%d...", name, zoom);
 
         return abaculus({
           zoom: zoom,
           center: {
-            x: place.lon,
-            y: place.lat,
+            x: place.geometry.coordinates[0],
+            y: place.geometry.coordinates[1],
             w: conf.width,
             h: conf.height
           },

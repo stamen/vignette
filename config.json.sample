@@ -1,14 +1,35 @@
 {
-  "San Francisco": {
-    "lat": 37.7649,
-    "lon": -122.4195,
-    "minzoom": 0,
-    "maxzoom": 18
-  },
-  "Madrid": {
-    "lat": 40.4345,
-    "lon": -3.7005,
-    "minzoom": 0,
-    "maxzoom": 18
-  }
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "San Francisco",
+        "minzoom": 0,
+        "maxzoom": 18
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.4196,
+          37.7659
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Madrid",
+        "minzoom": 0,
+        "maxzoom": 18
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.7005,
+          40.4345
+        ]
+      }
+    }
+  ]
 }

@@ -20,6 +20,6 @@
     "tilelive": "^5.8.2",
     "tilelive-mapnik": "^0.6.18",
     "tilelive-modules": "^0.1.4",
-    "@mapbox/tilejson": "^1.0.4"
+    "tilejson": "^1.0.3"
   }
 }

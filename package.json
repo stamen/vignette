@@ -8,10 +8,13 @@
   "dependencies": {
     "abaculus": "^1.2.0",
     "async": "^1.4.0",
+    "mapnik": "^3.4.3",
     "mkdirp": "^0.5.1",
     "nopt": "^3.0.3",
     "range": "0.0.3",
     "tilelive": "^5.8.2",
-    "tilelive-modules": "^0.1.4"
+    "tilelive-mapnik": "^0.6.18",
+    "tilelive-modules": "^0.1.4",
+    "tmp": "^0.0.31'
   }
 }

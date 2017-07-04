@@ -20,9 +20,7 @@ var types = {
   "input-dir-b": String,
   "output-dir": String,
   "joined-output-dir": String,
-  require: Array,
-  width: Number,
-  height: Number
+  require: Array
 };
 
 var shorthands = {

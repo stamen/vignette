@@ -5,6 +5,11 @@
   "bin": "index.js",
   "author": "Seth Fitzsimmons <seth@mojodna.net>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/stamen/vignette.git"
+  },
+  "url": "http://github.com/stamen/vignette",
   "dependencies": {
     "abaculus": "^1.2.0",
     "async": "^1.4.0",

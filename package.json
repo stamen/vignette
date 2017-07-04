@@ -1,6 +1,6 @@
 {
   "name": "vignette",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "bin": "index.js",
   "author": "Seth Fitzsimmons <seth@mojodna.net>",
@@ -15,6 +15,6 @@
     "tilelive": "^5.8.2",
     "tilelive-mapnik": "^0.6.18",
     "tilelive-modules": "^0.1.4",
-    "tmp": "^0.0.31'
+    "@mapbox/tilejson": "^1.0.4"
   }
 }

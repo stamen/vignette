@@ -2,6 +2,7 @@
 "use strict";
 
 var assert = require("assert"),
+    exec = require("child_process").exec,
     fs = require("fs"),
     path = require("path"),
     util = require("util");
@@ -48,49 +49,102 @@ require("./lib/modules")(tilelive, {
 
 var places = require(path.resolve(conf.config));
 
-async.waterfall([
-  async.apply(tilelive.load, uri),
-  function(source, done) {
-    return async.eachSeries(places.features, function(place, done) {
-      var name = place.properties.name;
+// If it's just a plain http url (that is, we're not using tilejson+http) then we need to use another approach,
+// not tilelive. This is a bit of a hack, but if you have tile-stitch installed in this repo, it will use the
+// tile-stitch/stitch executable to download tiles and combined them.
 
-      return async.eachSeries(range(place.properties.minzoom, place.properties.maxzoom + 1), function(zoom, done) {
-        console.log("Rendering %s at z%d...", name, zoom);
+// See http://github.com/ericfischer/tile-stitch
 
-        return abaculus({
-          zoom: zoom,
-          center: {
-            x: place.geometry.coordinates[0],
-            y: place.geometry.coordinates[1],
-            w: conf.width,
-            h: conf.height
-          },
-          getTile: source.getTile.bind(source)
-        }, function(err, image, headers) {
-          if (err) {
-            console.warn(err);
-            // ignore
-            return done();
-          }
+if (/^http/.test(uri)) {
 
-          var targetDir = path.resolve(path.join(conf["output-dir"], name)),
-              targetPath = path.join(targetDir, util.format("z%d.png", zoom));
+  // TODO: check if tile-stitch/stitch exists
 
-          return mkdirp(targetDir, function(err) {
-            if (err) {
+  async.eachSeries(places.features, function(place, done) {
+    var name = place.properties.name;
+    console.log(name);
+
+    return async.eachSeries(range(place.properties.minzoom, place.properties.maxzoom + 1), function(zoom, done) {
+      console.log("Stitching %s at z%d...", name, zoom);
+      //return true;
+
+      var targetDir = path.resolve(path.join(conf["output-dir"], name)),
+          targetPath = path.join(targetDir, util.format("z%d.png", zoom));
+      return mkdirp(targetDir, function(err) {
+        if (err) {
+          return done(err);
+        }
+        var command = 'tile-stitch/stitch -o '
+          + targetPath
+          + ' -c --'
+          + ' ' + place.geometry.coordinates[1]
+          + ' ' + place.geometry.coordinates[0]
+          + ' ' + conf.width
+          + ' ' + conf.height
+          + ' ' + zoom
+          + ' "' + uri + '"';
+        return exec(command, function(error,stdout,stderr) {
+            if (error)
+              console.log("err", error);
               return done(err);
+            console.log(`stdout: ${stdout}`);
+            console.log(`stderr: ${stderr}`);
+            return done;
+          });
+      });
+
+    }, done);
+  }, function(err) {
+    console.log("done");
+    if (err) {
+      throw err;
+    }
+  });
+} else {
+  async.waterfall([
+    async.apply(tilelive.load, uri),
+    function(source, done) {
+      return async.eachSeries(places.features, function(place, done) {
+        var name = place.properties.name;
+
+        return async.eachSeries(range(place.properties.minzoom, place.properties.maxzoom + 1), function(zoom, done) {
+          console.log("Rendering %s at z%d...", name, zoom);
+
+          return abaculus({
+            zoom: zoom,
+            center: {
+              x: place.geometry.coordinates[0],
+              y: place.geometry.coordinates[1],
+              w: conf.width,
+              h: conf.height
+            },
+            getTile: source.getTile.bind(source)
+          }, function(err, image, headers) {
+            if (err) {
+              console.warn(err);
+              // ignore
+              return done();
             }
 
-            return fs.writeFile(targetPath, image, done);
+            var targetDir = path.resolve(path.join(conf["output-dir"], name)),
+                targetPath = path.join(targetDir, util.format("z%d.png", zoom));
+
+            return mkdirp(targetDir, function(err) {
+              if (err) {
+                return done(err);
+              }
+
+              return fs.writeFile(targetPath, image, done);
+            });
+
           });
 
-        });
-
+        }, done);
       }, done);
-    }, done);
-  }
-], function(err) {
-  if (err) {
-    throw err;
-  }
-});
+    }
+  ], function(err) {
+    if (err) {
+      throw err;
+    }
+  });
+}
+
